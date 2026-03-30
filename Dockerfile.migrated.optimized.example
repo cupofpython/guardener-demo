@@ -1,0 +1,14 @@
+# ── Build stage ──────────────────────────────────────────────────────────────
+# Uses chainguard-base with build-time tools (curl, git) to fetch/prepare deps
+FROM cgr.dev/9b63cde9908105cdbb857a85ed3ed6f26a5a142a/chainguard-base AS builder
+WORKDIR /app
+RUN apk add --no-cache curl git python3
+COPY . .
+
+# ── Runtime stage ─────────────────────────────────────────────────────────────
+# Minimal Python image — no curl/git, smaller attack surface
+FROM cgr.dev/9b63cde9908105cdbb857a85ed3ed6f26a5a142a/python:latest
+WORKDIR /app
+COPY --from=builder /app .
+CMD ["app.py"]
+

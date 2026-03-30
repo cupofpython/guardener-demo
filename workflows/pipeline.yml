@@ -1,0 +1,96 @@
+# Run the Guardener
+
+name: Guarden my Dockerfile
+
+# Manual run, provide group ID and desired tag at runtime
+# Verify that the identity secret is added to the repository secrets before running
+on:
+  workflow_dispatch:
+    secrets:
+      GUARDENER_DEMO_CHAINCTL_IDENTITY:
+        required: true
+    inputs:
+      IMAGE_TAG:
+        required: true
+        type: string
+      GROUP:
+        required: true
+        type: string
+      SERVER_ADDR:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  NAMESPACE: chainguard-demo
+  IMAGE_NAME: guardener-demo
+
+jobs:
+  # Run the Guardener to migrate the Dockerfile
+  run-guardener:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Setup chainctl
+        uses: chainguard-dev/setup-chainctl@v0.5.0
+
+      - name: Run guardener on Dockerfile
+        shell: bash
+        run: |
+          chainctl auth login \
+            --audience dfc \
+            --identity "${{ secrets.GUARDENER_DEMO_CHAINCTL_IDENTITY }}"
+
+          chainctl agent dockerfile build -f Dockerfile -t myapp:cg \
+            --server-addr "${{ env.SERVER_ADDR }}" \
+            --group "${{ inputs.GROUP }}" \
+            --non-interactive
+
+      - name: Save migrated Dockerfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dockerfile.migrated
+          path: output/
+  
+  # Build and push the migrated image to GitHub Container Registry
+  build-and-push-image:
+    needs: run-guardener
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: 'Login to GitHub Container Registry'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Setup chainctl
+        uses: chainguard-dev/setup-chainctl@v0.5.0
+        with:
+          identity: ${{ secrets.GUARDENER_DEMO_CHAINCTL_IDENTITY }}
+
+      - name: Download migrated Dockerfile
+        uses: actions/download-artifact@v4
+        with:
+          name: Dockerfile.migrated
+          path: output/
+
+      - name: Build and push image with new Dockerfile
+        run: |
+          docker build -f output/Dockerfile.migrated -t ghcr.io/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
+          docker push ghcr.io/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
