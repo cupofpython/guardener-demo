@@ -7,13 +7,6 @@ The Guardener is an AI tool that migrates customer Dockerfiles to use Chainguard
 
 This allows prospects and customers to convert their Dockerfiles with ease, and optimize them to align with best practices.
 
-## How does it work?
-Let's review the [architecture](https://github.com/chainguard-dev/mono/blob/main/containers/dfc/docs/architecture.md).
-
-The agent loop runs on the server while Docker operations execute on the client. This keeps source code local and allows the server to use Vertex AI or other backends. We migrate one instruction at a time to catch issues early: Claude receives the original Dockerfile, migrated-so-far, and current instruction, then researches, builds and tests translation, and completes the layer. 
-
-Primary focus here is that your source code stays local, but Claude receives your Dockerfile in order to migrate and optimize it.
-
 ## Tell :star:
 
 In this demo, we are going to see:
