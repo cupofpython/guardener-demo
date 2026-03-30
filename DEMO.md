@@ -1,5 +1,3 @@
-# guardener-demo
-Demo of the Chainguardener for SEs
 # Demo for the Guardner
 
 
@@ -9,6 +7,12 @@ The Guardener is an AI tool that migrates customer Dockerfiles to use Chainguard
 
 This allows prospects and customers to convert their Dockerfiles with ease, and optimize them to align with best practices.
 
+## How does it work?
+Let's review the [architecture](https://github.com/chainguard-dev/mono/blob/main/containers/dfc/docs/architecture.md).
+
+The agent loop runs on the server while Docker operations execute on the client. This keeps source code local and allows the server to use Vertex AI or other backends. We migrate one instruction at a time to catch issues early: Claude receives the original Dockerfile, migrated-so-far, and current instruction, then researches, builds and tests translation, and completes the layer. 
+
+Primary focus here is that your source code stays local, but Claude receives your Dockerfile in order to migrate and optimize it.
 
 ## Tell :star:
 
@@ -41,7 +45,7 @@ Let's convert our Dockerfile to use the Chainguard base. Simply run:
 ```
 chainctl agent dockerfile build -f Dockerfile -t myapp:cg \             
   --server-addr dfc-245344163251.us-central1.run.app \
-  --group $GROUP
+  --group $GROUP  
 ```
 This will do several steps:
 - Parse the Dockerfile
@@ -96,15 +100,7 @@ Let's review the output. Open `Dockerfile.migrated.optimized` to see it applied.
 
 ### Beyond the Laptop -- Running in CI
 
-You can leverage the Guardener in CI/CD to migrate your Dockerfiles at scale. In this example, we will show the migration as a pre-build job, then build and push the image based on the new Dockerfile to a registry.
-
-Navigate to `.github/workflows/pipeline.yml`
-
-We simply install `chainctl` and authenticate, then run the same Guardener commands as jobs in the GitHub Actions pipeline.
-
-To trigger a pipeline run, select Actions -> Guarden Your Dockerfile and supply your group ID obtained earlier and the desired tag for the image. Note: Ensure that the secret `GUARDENER_DEMO_CHAINCTL_IDENTITY' exists in the repo settings.
-
-WIP: Link to pipeline run (need to create an individual repo for this, since you can't trigger workflow when .github/workflows/pipeline.yml file does not exist at root directory. YNAD is a monorepo).
+[Example pipeline converting Dockerfiles]
 
 ## Tell :star:
 
