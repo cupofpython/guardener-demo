@@ -2,7 +2,7 @@
 
 This is a demo of the Guardener. Please follow the script in DEMO.md.
 
-[Recording]()
+[Recording](https://drive.google.com/file/d/11IiklC_bNzjw37B8inbPB7g-H86SSXcG/view?usp=sharing)
 
 ## Getting Started
 1. Create a fork of this repository
