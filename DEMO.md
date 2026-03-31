@@ -19,7 +19,7 @@ In this demo, we are going to see:
 
 First, authenticate with `chainctl`:
 
-`chainctl auth login --audience dfc`
+`chainctl auth login`
 
 Next, obtain your Chainguard registry's group ID, provided $DOMAIN is your org name.
 
@@ -36,8 +36,7 @@ echo $GROUP
 Let's convert our Dockerfile to use the Chainguard base. Simply run:
 
 ```
-chainctl agent dockerfile build -f Dockerfile -t myapp:cg \             
-  --server-addr dfc-245344163251.us-central1.run.app \
+chainctl agent dockerfile build -f Dockerfile -t myapp:cg \
   --group $GROUP  
 ```
 This will do several steps:
@@ -71,8 +70,7 @@ Test Summary
 While converted Dockerfiles may be funtionally equivalent, we want to ensure we are following all of the container best practices. Let's optimize our new Dockerfile.
 
 ```
-chainctl agent dockerfile optimize -f Dockerfile.migrated \            
-  --server-addr dfc-245344163251.us-central1.run.app \
+chainctl agent dockerfile optimize -f Dockerfile.migrated \
   --group $GROUP
 ```
 
@@ -93,7 +91,11 @@ Let's review the output. Open `Dockerfile.migrated.optimized` to see it applied.
 
 ### Beyond the Laptop -- Running in CI
 
-[Example pipeline converting Dockerfiles]
+You can leverage the Guardener in CI/CD to migrate your Dockerfiles at scale. In this example, we will show the migration as a pre-build job, then build and push the image based on the new Dockerfile to a registry.
+
+Navigate to `.github/workflows/pipeline.yml`
+
+We simply install `chainctl` and authenticate, then run the same Guardener commands as jobs in the GitHub Actions pipeline.
 
 ## Tell :star:
 
