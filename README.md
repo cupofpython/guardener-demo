@@ -13,3 +13,5 @@ This is a demo of the Guardener. Please follow the script in DEMO.md.
 ## Running CI
 1. Access the pipeline in the Actions section
 1. Select `Run the Guardener` and input your group ID, desired image tag name, and your repo namespace
+- Note: Ensure that under Settings > Actions > General > Workflow permissions, `Read and write permissions` are enabled
+- Note: Ensure that under Your Profile > Packages > guardener-demo > Package Settings > Manage Actions access your repo is listed with write access. If not, add it.

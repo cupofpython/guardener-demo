@@ -123,3 +123,7 @@ jobs:
           fail-build: false
           output-format: json
           output-file: scan-results.json
+
+      - name: Show Grype scan results
+        run: |
+          cat scan-results.json | jq '[.matches[] | {severity: .vulnerability.severity, id: .vulnerability.id, package: .artifact.name}]'
